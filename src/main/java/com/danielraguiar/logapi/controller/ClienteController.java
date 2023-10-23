@@ -3,6 +3,8 @@ package com.danielraguiar.logapi.controller;
 import com.danielraguiar.logapi.domain.model.Cliente;
 import com.danielraguiar.logapi.domain.repository.ClienteRepository;
 import com.danielraguiar.logapi.domain.service.ClienteService;
+import com.danielraguiar.logapi.dto.ClienteDTO;
+import com.danielraguiar.logapi.mapper.ClienteMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.Valid;
@@ -23,26 +25,29 @@ public class ClienteController {
     @Autowired
     private ClienteService clienteService;
 
+    @Autowired
+    private ClienteMapper clienteMapper;
+
     @GetMapping
-    public List<Cliente> listar() {
-        return clienteRepository.findAll();
+    public List<ClienteDTO> listar() {
+        return clienteMapper.toListDto(clienteRepository.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscar(@PathVariable Long id) {
+    public ResponseEntity<ClienteDTO> buscar(@PathVariable Long id) {
         return clienteRepository.findById(id)
-                .map(ResponseEntity::ok)
+                .map(cliente -> ResponseEntity.ok(clienteMapper.toDto(cliente)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
-        return clienteService.salvar(cliente);
+    public ClienteDTO adicionar(@Valid @RequestBody Cliente cliente) {
+        return clienteMapper.toDto(clienteService.salvar(cliente));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
+    public ResponseEntity<ClienteDTO> atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
         if(!clienteRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -50,7 +55,7 @@ public class ClienteController {
         cliente.setId(id);
         cliente = clienteService.salvar(cliente);
 
-        return ResponseEntity.ok(cliente);
+        return ResponseEntity.ok(clienteMapper.toDto(cliente));
     }
 
     @DeleteMapping
