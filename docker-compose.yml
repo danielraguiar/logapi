@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  db:
+    container_name: logapi
+    image: mysql:latest
+    ports:
+      - '3306:3306'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: logapi
+      MYSQL_USER: logapi
+      MYSQL_PASSWORD: 123456
+    command: --default-authentication-plugin=mysql_native_password
