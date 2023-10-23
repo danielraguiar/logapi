@@ -45,4 +45,10 @@ public class EntregaController {
                 .map(entrega -> ResponseEntity.ok(entregaMapper.toDto(entrega)))
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/{id}/finalizacao")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void finalizar(@PathVariable Long id) {
+        entregaService.finalizar(id);
+    }
 }

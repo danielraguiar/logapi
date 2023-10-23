@@ -37,5 +37,12 @@ public class EntregaService {
                 .orElseThrow(() -> new EntityNotFoundException("Entrega não encontrada"));
     }
 
+    @Transactional
+    public void finalizar(Long id) {
+        Entrega entrega = buscaEntrega(id);
 
+        entrega.finalizar();
+
+        entregaRepository.save(entrega);
+    }
 }

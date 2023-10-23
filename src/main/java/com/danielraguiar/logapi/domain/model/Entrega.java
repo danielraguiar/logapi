@@ -1,6 +1,7 @@
 package com.danielraguiar.logapi.domain.model;
 
 import com.danielraguiar.logapi.domain.ValidationGroups;
+import com.danielraguiar.logapi.domain.exception.Exceptions;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -62,5 +63,22 @@ public class Entrega {
         this.getOcorrencias().add(ocorrencia);
 
         return ocorrencia;
+    }
+
+    public void finalizar() {
+        if(naoPodeSerFinalizada()) {
+            throw new Exceptions("Entrega não pode ser finalizada!");
+        }
+
+        setStatusEntrega(StatusEntrega.FINALIZADA);
+        setDataFinalizacao(OffsetDateTime.now());
+    }
+
+    private boolean naoPodeSerFinalizada() {
+        return !podeSerFinalizada();
+    }
+
+    private boolean podeSerFinalizada() {
+        return StatusEntrega.PENDENTE.equals(getStatusEntrega());
     }
 }
