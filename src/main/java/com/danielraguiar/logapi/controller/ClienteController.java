@@ -2,6 +2,7 @@ package com.danielraguiar.logapi.controller;
 
 import com.danielraguiar.logapi.domain.model.Cliente;
 import com.danielraguiar.logapi.domain.repository.ClienteRepository;
+import com.danielraguiar.logapi.domain.service.ClienteService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.Valid;
@@ -19,6 +20,9 @@ public class ClienteController {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private ClienteService clienteService;
+
     @GetMapping
     public List<Cliente> listar() {
         return clienteRepository.findAll();
@@ -34,7 +38,7 @@ public class ClienteController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
-        return clienteRepository.save(cliente);
+        return clienteService.salvar(cliente);
     }
 
     @PutMapping("/{id}")
@@ -44,7 +48,7 @@ public class ClienteController {
         }
 
         cliente.setId(id);
-        cliente = clienteRepository.save(cliente);
+        cliente = clienteService.salvar(cliente);
 
         return ResponseEntity.ok(cliente);
     }
@@ -55,7 +59,7 @@ public class ClienteController {
             return ResponseEntity.notFound().build();
         }
 
-        clienteRepository.deleteById(id);
+        clienteService.excluir(id);
 
         return ResponseEntity.noContent().build();
     }

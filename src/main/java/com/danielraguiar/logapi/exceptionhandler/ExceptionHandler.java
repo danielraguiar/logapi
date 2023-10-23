@@ -1,9 +1,11 @@
 package com.danielraguiar.logapi.exceptionhandler;
 
+import com.danielraguiar.logapi.domain.exception.Exceptions;
 import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -25,19 +27,30 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
     private MessageSource messageSource;
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        List<Error.Campo> campos = new ArrayList<>();
+
+        for(ObjectError error : ex.getBindingResult().getAllErrors()) {
+            String nome = ((FieldError) error).getField();
+            String mensagem = messageSource.getMessage(error, LocaleContextHolder.getLocale());
+
+            campos.add(new Error.Campo(nome, mensagem));
+        }
         Error error = new Error();
-        List<Error.Campo> campos = ex.getBindingResult().getAllErrors().stream()
-                .filter(errors -> errors instanceof FieldError)
-                .map(errors -> {
-                    FieldError fieldError = (FieldError) errors;
-                    String nome = fieldError.getField();
-                    String mensagem = messageSource.getMessage(errors, LocaleContextHolder.getLocale());
-                    return new Error.Campo(nome, mensagem);
-                })
-                .collect(Collectors.toList());        error.setStatus(status.value());
+        error.setStatus(status.value());
         error.setDataHora(LocalDateTime.now());
         error.setTitulo("Um ou mais campos estão inválidos. Faça o preenchimento corretamente e tente novamente.");
         error.setCampos(campos);
         return handleExceptionInternal(ex, "Valor i", headers, status, request);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(Exceptions.class)
+    public ResponseEntity<Object> handleException(Exceptions ex, WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        Error error = new Error();
+        error.setStatus(status.value());
+        error.setDataHora(LocalDateTime.now());
+        error.setTitulo(ex.getMessage());
+        return handleExceptionInternal(ex, error, new HttpHeaders(), status, request);
     }
 }
