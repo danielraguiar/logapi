@@ -5,6 +5,7 @@ import com.danielraguiar.logapi.domain.repository.ClienteRepository;
 import com.danielraguiar.logapi.domain.repository.EntregaRepository;
 import com.danielraguiar.logapi.domain.service.EntregaService;
 import com.danielraguiar.logapi.dto.EntregaDTO;
+import com.danielraguiar.logapi.input.EntregaInput;
 import com.danielraguiar.logapi.mapper.EntregaMapper;
 import jakarta.validation.Valid;
 import org.apache.coyote.Response;
@@ -29,8 +30,8 @@ public class EntregaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EntregaDTO solicitar(@Valid @RequestBody Entrega entrega) {
-        return entregaMapper.toDto(entregaService.solicitar(entrega));
+    public EntregaDTO solicitar(@Valid @RequestBody EntregaInput entregaInput) {
+        return entregaMapper.toDto(entregaService.solicitar(entregaMapper.toEntity(entregaInput)));
     }
 
     @GetMapping

@@ -1,5 +1,6 @@
 package com.danielraguiar.logapi.domain.service;
 
+import com.danielraguiar.logapi.domain.exception.EntityNotFoundException;
 import com.danielraguiar.logapi.domain.exception.Exceptions;
 import com.danielraguiar.logapi.domain.model.Cliente;
 import com.danielraguiar.logapi.domain.model.Entrega;
@@ -29,6 +30,11 @@ public class EntregaService {
         entrega.setStatusEntrega(StatusEntrega.PENDENTE);
         entrega.setDataPedido(OffsetDateTime.now());
         return entregaRepository.save(entrega);
+    }
+
+    public Entrega buscaEntrega(Long id) {
+        return entregaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Entrega não encontrada"));
     }
 
 

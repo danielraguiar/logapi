@@ -1,5 +1,6 @@
 package com.danielraguiar.logapi.exceptionhandler;
 
+import com.danielraguiar.logapi.domain.exception.EntityNotFoundException;
 import com.danielraguiar.logapi.domain.exception.Exceptions;
 import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -47,6 +48,17 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler(Exceptions.class)
     public ResponseEntity<Object> handleException(Exceptions ex, WebRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        Error error = new Error();
+        error.setStatus(status.value());
+        error.setDataHora(OffsetDateTime.now());
+        error.setTitulo(ex.getMessage());
+        return handleExceptionInternal(ex, error, new HttpHeaders(), status, request);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Object> handleEntityNotFound(Exceptions ex, WebRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
 
         Error error = new Error();
         error.setStatus(status.value());

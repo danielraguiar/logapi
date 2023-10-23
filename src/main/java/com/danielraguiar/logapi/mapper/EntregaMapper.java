@@ -2,6 +2,7 @@ package com.danielraguiar.logapi.mapper;
 
 import com.danielraguiar.logapi.domain.model.Entrega;
 import com.danielraguiar.logapi.dto.EntregaDTO;
+import com.danielraguiar.logapi.input.EntregaInput;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -23,5 +24,9 @@ public class EntregaMapper {
         return entregas.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public Entrega toEntity(EntregaInput entregaInput) {
+        return modelMapper.map(entregaInput, Entrega.class);
     }
 }
